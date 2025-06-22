@@ -141,13 +141,12 @@
             body.dark .invoice-table tbody td::before {
                 color: #a0aec0; /* light gray */
             }
+            /* Remove actions-td specific styling for mobile as buttons are now removed */
             .invoice-table .actions-td {
-                justify-content: flex-start; /* Align action buttons to start on mobile */
-                margin-top: 0.5rem; /* Add space above buttons */
-                gap: 0.5rem; /* Space between buttons */
+                display: none; /* Hide actions cell on mobile */
             }
             .invoice-table .actions-td::before {
-                content: none; /* Hide label for actions on mobile */
+                content: none;
             }
         }
     </style>
@@ -171,14 +170,14 @@
             <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-blue-800 mb-4">Agregar Repuesto</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="partName" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Nombre del Repuesto:</label>
+                    <label for="partName" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Descripción:</label>
                     <input type="text" id="partName"
                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm sm:text-base"
                            placeholder="Ej: Empaque de culata"
                            required>
                 </div>
                 <div>
-                    <label for="partCost" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Costo Unitario (₡):</label>
+                    <label for="partCost" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Costo (₡):</label>
                     <input type="number" id="partCost"
                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm sm:text-base"
                            placeholder="Ej: 25000"
@@ -187,16 +186,7 @@
                            required>
                 </div>
             </div>
-            <div class="mt-4">
-                <label for="partQuantity" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Cantidad:</label>
-                <input type="number" id="partQuantity"
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm sm:text-base"
-                       placeholder="Ej: 1"
-                       min="1"
-                       step="1"
-                       value="1"
-                       required>
-            </div>
+            <!-- Removed Quantity Input -->
             <button id="addPartBtn"
                     class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-base sm:text-lg">
                 Agregar Repuesto
@@ -205,16 +195,14 @@
 
         <!-- Parts List Section (Invoice Style) -->
         <div class="mb-8 p-4 bg-green-50 rounded-lg border border-green-200 overflow-x-auto">
-            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-green-800 mb-4">Detalle de Repuestos (Factura)</h2>
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-green-800 mb-4">Lista de Repuestos</h2>
             <div class="min-w-full inline-block align-middle">
                 <table class="min-w-full invoice-table divide-y divide-gray-200 dark:divide-gray-600">
                     <thead>
                         <tr>
-                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Repuesto</th>
-                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Cant.</th>
-                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">P. Unitario</th>
-                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Subtotal</th>
-                            <th scope="col" class="px-2 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Acciones</th>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">No.</th>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Descripción</th>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Costo</th>
                         </tr>
                     </thead>
                     <tbody id="partsList" class="bg-white divide-y divide-gray-200 dark:bg-gray-700 dark:divide-gray-600">
@@ -227,7 +215,7 @@
 
         <!-- Total Section -->
         <div class="p-5 bg-yellow-50 rounded-xl border border-yellow-300 flex justify-between items-center shadow-inner">
-            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-800">Total General:</h2>
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-800">Total de Gastos:</h2>
             <span id="totalCost" class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-900">₡0.00</span>
         </div>
     </div>
@@ -246,10 +234,9 @@
     <script>
         // Get references to HTML elements
         const partNameInput = document.getElementById('partName');
-        const partCostInput = document.getElementById('partCost'); // Now Unit Cost
-        const partQuantityInput = document.getElementById('partQuantity');
+        const partCostInput = document.getElementById('partCost');
         const addPartBtn = document.getElementById('addPartBtn');
-        const partsList = document.getElementById('partsList'); // This is now a tbody
+        const partsList = document.getElementById('partsList');
         const totalCostSpan = document.getElementById('totalCost');
         const noPartsMessage = document.getElementById('noPartsMessage');
         const darkModeToggle = document.getElementById('darkModeToggle');
@@ -280,10 +267,10 @@
         }
 
         /**
-         * Calculates the total expenses by summing up all item subtotals.
+         * Calculates the total expenses by summing up all item costs.
          */
         function calculateTotalExpenses() {
-            totalExpenses = parts.reduce((sum, part) => sum + (part.cost * part.quantity), 0);
+            totalExpenses = parts.reduce((sum, part) => sum + part.cost, 0);
             totalCostSpan.textContent = formatCurrency(totalExpenses);
         }
 
@@ -304,8 +291,10 @@
 
             if (savedParts) {
                 parts = JSON.parse(savedParts);
-                parts.forEach(part => {
-                    renderPartItem(part); // Render each loaded part
+                // When loading, clear the list first to prevent duplicates
+                partsList.innerHTML = '';
+                parts.forEach((part, index) => { // Pass index for numbering
+                    renderPartItem(part, index + 1); // Render each loaded part with its number
                 });
             }
             calculateTotalExpenses(); // Ensure total is calculated on load
@@ -314,34 +303,76 @@
 
         /**
          * Renders a single part item as a table row (invoice style).
-         * @param {object} part - The part object { id, name, cost, quantity }.
+         * @param {object} part - The part object { id, name, cost }.
+         * @param {number} itemNumber - The sequential number for the item.
          */
-        function renderPartItem(part) {
+        function renderPartItem(part, itemNumber) {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150';
             tr.setAttribute('data-id', part.id);
 
-            const subtotal = part.cost * part.quantity;
-
             tr.innerHTML = `
-                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Repuesto:">${part.name}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Cant.:">${part.quantity}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="P. Unitario:">${formatCurrency(part.cost)}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-yellow-800 font-semibold dark:text-yellow-400" data-label="Subtotal:">${formatCurrency(subtotal)}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-right actions-td">
-                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105 mr-1">
-                        Editar
-                    </button>
-                    <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
-                        Eliminar
-                    </button>
-                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="No.:">${itemNumber}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Descripción:">${part.name}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="Costo:">${formatCurrency(part.cost)}</td>
             `;
             partsList.appendChild(tr);
 
-            // Add event listeners to the new buttons
-            tr.querySelector('.edit-btn').addEventListener('click', () => editPart(part.id));
-            tr.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(part.id));
+            // Add context menu (right-click or long-press) for edit/delete
+            tr.addEventListener('contextmenu', (e) => {
+                e.preventDefault(); // Prevent default context menu
+                showPartActionsModal(part.id);
+            });
+        }
+
+        /**
+         * Shows a modal with Edit and Delete options for a specific part.
+         * @param {number} id - The ID of the part.
+         */
+        function showPartActionsModal(id) {
+            modalMessage.textContent = 'Selecciona una acción para este repuesto:';
+            modalConfirmBtn.classList.add('hidden'); // Hide confirm button by default
+
+            // Create custom action buttons for the modal
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Editar';
+            editButton.className = 'bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out text-sm sm:text-base mr-2';
+            editButton.onclick = () => {
+                customModal.classList.add('hidden');
+                editPart(id);
+            };
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out text-sm sm:text-base';
+            deleteButton.onclick = () => {
+                customModal.classList.add('hidden');
+                confirmDeletePart(id);
+            };
+
+            // Clear existing buttons and add new ones
+            const modalButtonsDiv = document.getElementById('modalButtons');
+            modalButtonsDiv.innerHTML = '';
+            modalButtonsDiv.appendChild(editButton);
+            modalButtonsDiv.appendChild(deleteButton);
+            modalButtonsDiv.appendChild(modalCloseBtn); // Add the original close button
+
+            modalCloseBtn.textContent = 'Cancelar'; // Set text for cancel button
+            modalCloseBtn.onclick = () => customModal.classList.add('hidden'); // Set action for cancel button
+
+            customModal.classList.remove('hidden');
+        }
+
+
+        /**
+         * Re-renders the entire parts list to ensure correct numbering after changes.
+         */
+        function reRenderPartsList() {
+            partsList.innerHTML = ''; // Clear current list
+            parts.forEach((part, index) => {
+                renderPartItem(part, index + 1); // Re-render with updated numbering
+            });
+            updateNoPartsMessageVisibility();
         }
 
         /**
@@ -361,19 +392,14 @@
         function addPart() {
             const name = partNameInput.value.trim();
             const cost = parseFloat(partCostInput.value);
-            const quantity = parseInt(partQuantityInput.value);
 
             // Validate inputs
             if (name === '') {
-                showModal('Por favor, ingresa el nombre del repuesto.', 'alert');
+                showModal('Por favor, ingresa la descripción del repuesto.', 'alert');
                 return;
             }
             if (isNaN(cost) || cost <= 0) {
-                showModal('Por favor, ingresa un costo unitario válido mayor que cero.', 'alert');
-                return;
-            }
-            if (isNaN(quantity) || quantity <= 0) {
-                showModal('Por favor, ingresa una cantidad válida mayor que cero.', 'alert');
+                showModal('Por favor, ingresa un costo válido mayor que cero.', 'alert');
                 return;
             }
 
@@ -381,20 +407,17 @@
             const newPart = {
                 id: Date.now(), // Simple unique ID using timestamp
                 name: name,
-                cost: cost,
-                quantity: quantity
+                cost: cost
             };
             parts.push(newPart); // Add to the parts array
 
-            renderPartItem(newPart); // Render the new part in the list
-
-            // Clear input fields and reset quantity to 1 for convenience
+            // Clear input fields
             partNameInput.value = '';
             partCostInput.value = '';
-            partQuantityInput.value = '1';
 
-            // Save data to local storage
+            // Save data to local storage (this will re-render and recalculate total)
             saveToLocalStorage();
+            reRenderPartsList(); // Re-render to ensure correct numbering
         }
 
         /**
@@ -411,25 +434,16 @@
             // Store original values to revert if cancelled
             const originalName = part.name;
             const originalCost = part.cost;
-            const originalQuantity = part.quantity;
 
             // Get all existing cells
             const cells = tr.querySelectorAll('td');
 
-            // Create input fields for Name, Quantity, Unit Cost
+            // Create input fields for Name and Cost
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.value = part.name;
             nameInput.className = 'w-full p-1 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white text-sm';
-            nameInput.setAttribute('data-label', 'Repuesto:'); // For mobile display
-
-            const quantityInput = document.createElement('input');
-            quantityInput.type = 'number';
-            quantityInput.value = part.quantity;
-            quantityInput.className = 'w-full p-1 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white text-sm';
-            quantityInput.min = "1";
-            quantityInput.step = "1";
-            quantityInput.setAttribute('data-label', 'Cant.:'); // For mobile display
+            nameInput.setAttribute('data-label', 'Descripción:'); // For mobile display
 
             const costInput = document.createElement('input');
             costInput.type = 'number';
@@ -437,7 +451,7 @@
             costInput.className = 'w-full p-1 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white text-sm';
             costInput.min = "0";
             costInput.step = "any";
-            costInput.setAttribute('data-label', 'P. Unitario:'); // For mobile display
+            costInput.setAttribute('data-label', 'Costo:'); // For mobile display
 
             // Create Save and Cancel buttons
             const saveBtn = document.createElement('button');
@@ -448,47 +462,52 @@
             cancelBtn.textContent = 'Cancelar';
             cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-2 rounded-lg text-xs transition duration-300 ease-in-out transform hover:scale-105';
 
-            // Replace cell content with input fields
-            cells[0].innerHTML = ''; // Name
-            cells[0].appendChild(nameInput);
-            cells[1].innerHTML = ''; // Quantity
-            cells[1].appendChild(quantityInput);
-            cells[2].innerHTML = ''; // Unit Price
+            // Replace cell content with input fields, skipping the first (No.) column
+            cells[1].innerHTML = ''; // Description
+            cells[1].appendChild(nameInput);
+            cells[2].innerHTML = ''; // Cost
             cells[2].appendChild(costInput);
-            cells[3].textContent = ''; // Subtotal (will be recalculated on save)
 
-            const actionsCell = cells[4];
-            actionsCell.innerHTML = ''; // Clear existing buttons
-            actionsCell.appendChild(saveBtn);
-            actionsCell.appendChild(cancelBtn);
+            // Temporarily replace row content to show buttons
+            const tempActionsCell = document.createElement('td');
+            tempActionsCell.className = 'px-2 py-2 whitespace-nowrap text-right actions-td';
+            tempActionsCell.appendChild(saveBtn);
+            tempActionsCell.appendChild(cancelBtn);
+
+            // Create a temporary row structure for editing
+            const tempRowContent = `
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="No.:">${parts.indexOf(part) + 1}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Descripción:"></td>
+                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="Costo:"></td>
+            `;
+            tr.innerHTML = tempRowContent; // Clear and set basic structure
+
+            // Now append inputs to the correct cells
+            tr.querySelector('td[data-label="Descripción:"]').appendChild(nameInput);
+            tr.querySelector('td[data-label="Costo:"]').appendChild(costInput);
+            tr.appendChild(tempActionsCell); // Add temporary actions cell
 
             // Add event listeners to the new buttons
-            saveBtn.addEventListener('click', () => saveEdit(id, nameInput.value, costInput.value, quantityInput.value));
-            cancelBtn.addEventListener('click', () => cancelEdit(id, originalName, originalCost, originalQuantity));
+            saveBtn.addEventListener('click', () => saveEdit(id, nameInput.value, costInput.value));
+            cancelBtn.addEventListener('click', () => cancelEdit(id, originalName, originalCost));
         }
 
         /**
          * Saves the edited part data.
          * @param {number} id - The ID of the part being edited.
          * @param {string} newName - The new name for the part.
-         * @param {number} newCost - The new unit cost for the part.
-         * @param {number} newQuantity - The new quantity for the part.
+         * @param {number} newCost - The new cost for the part.
          */
-        function saveEdit(id, newName, newCost, newQuantity) {
+        function saveEdit(id, newName, newCost) {
             newName = newName.trim();
             newCost = parseFloat(newCost);
-            newQuantity = parseInt(newQuantity);
 
             if (newName === '') {
-                showModal('Por favor, ingresa el nombre del repuesto.', 'alert');
+                showModal('Por favor, ingresa la descripción del repuesto.', 'alert');
                 return;
             }
             if (isNaN(newCost) || newCost <= 0) {
-                showModal('Por favor, ingresa un costo unitario válido mayor que cero.', 'alert');
-                return;
-            }
-            if (isNaN(newQuantity) || newQuantity <= 0) {
-                showModal('Por favor, ingresa una cantidad válida mayor que cero.', 'alert');
+                showModal('Por favor, ingresa un costo válido mayor que cero.', 'alert');
                 return;
             }
 
@@ -497,52 +516,37 @@
 
             parts[partIndex].name = newName;
             parts[partIndex].cost = newCost;
-            parts[partIndex].quantity = newQuantity;
 
-            // Remove old row and re-render the updated row
-            const oldTr = partsList.querySelector(`[data-id="${id}"]`);
-            if (oldTr) {
-                partsList.removeChild(oldTr);
-            }
-            renderPartItem(parts[partIndex]);
-
-            saveToLocalStorage(); // This will also recalculate total
+            saveToLocalStorage(); // Save changes and recalculate total
+            reRenderPartsList(); // Re-render the entire list to update all cells and numbering
         }
 
         /**
          * Cancels the editing process and reverts the item to its original state.
          * @param {number} id - The ID of the part being edited.
          * @param {string} originalName - The original name of the part.
-         * @param {number} originalCost - The original unit cost of the part.
-         * @param {number} originalQuantity - The original quantity of the part.
+         * @param {number} originalCost - The original cost of the part.
          */
-        function cancelEdit(id, originalName, originalCost, originalQuantity) {
+        function cancelEdit(id, originalName, originalCost) {
             const tr = partsList.querySelector(`[data-id="${id}"]`);
             if (!tr) return;
 
-            // Find the part in the array (even though we have original values, it's good practice)
-            const part = parts.find(p => p.id === id);
-            if (!part) return;
-
             // Revert content of the row
+            const partIndex = parts.findIndex(p => p.id === id);
+            if (partIndex === -1) return;
+            const itemNumber = partIndex + 1; // Get the correct item number
+
             tr.innerHTML = `
-                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Repuesto:">${originalName}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Cant.:">${originalQuantity}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="P. Unitario:">${formatCurrency(originalCost)}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-yellow-800 font-semibold dark:text-yellow-400" data-label="Subtotal:">${formatCurrency(originalCost * originalQuantity)}</td>
-                <td class="px-2 py-2 whitespace-nowrap text-right actions-td">
-                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105 mr-1">
-                        Editar
-                    </button>
-                    <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
-                        Eliminar
-                    </button>
-                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="No.:">${itemNumber}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Descripción:">${originalName}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="Costo:">${formatCurrency(originalCost)}</td>
             `;
 
-            // Re-attach event listeners
-            tr.querySelector('.edit-btn').addEventListener('click', () => editPart(id));
-            tr.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(id));
+            // Add context menu (right-click or long-press) for edit/delete
+            tr.addEventListener('contextmenu', (e) => {
+                e.preventDefault(); // Prevent default context menu
+                showPartActionsModal(id);
+            });
         }
 
 
@@ -565,14 +569,9 @@
             // Remove from array
             parts.splice(partIndex, 1);
 
-            // Remove from DOM
-            const tr = partsList.querySelector(`[data-id="${id}"]`);
-            if (tr) {
-                tr.remove();
-            }
-
             // Save data to local storage (this will also recalculate total)
             saveToLocalStorage();
+            reRenderPartsList(); // Re-render the entire list to update numbering and remove the row
         }
 
         /**
@@ -612,10 +611,12 @@
             customModal.classList.remove('hidden');
 
             // Reset buttons
-            modalConfirmBtn.classList.add('hidden');
-            modalCloseBtn.textContent = 'Aceptar';
+            const modalButtonsDiv = document.getElementById('modalButtons');
+            modalButtonsDiv.innerHTML = ''; // Clear previous buttons
+            modalConfirmBtn.classList.add('hidden'); // Ensure hidden by default
 
             if (type === 'confirm') {
+                modalButtonsDiv.appendChild(modalConfirmBtn); // Add confirm button
                 modalConfirmBtn.classList.remove('hidden');
                 modalConfirmBtn.onclick = () => {
                     if (onConfirm) onConfirm();
@@ -624,8 +625,10 @@
                 modalCloseBtn.textContent = 'Cancelar';
                 modalCloseBtn.onclick = () => customModal.classList.add('hidden');
             } else { // type === 'alert'
+                modalCloseBtn.textContent = 'Aceptar';
                 modalCloseBtn.onclick = () => customModal.classList.add('hidden');
             }
+            modalButtonsDiv.appendChild(modalCloseBtn); // Always add the close/cancel button
         }
 
 
@@ -650,12 +653,7 @@
             }
         });
 
-        partQuantityInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Prevent default form submission
-                addPart();
-            }
-        });
+        // Removed partQuantityInput event listener as the field is removed
 
         // Load data and initialize dark mode when the page loads
         window.onload = function() {
