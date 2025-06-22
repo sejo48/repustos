@@ -209,15 +209,18 @@
          */
         function renderPartItem(part) {
             const listItem = document.createElement('li');
+            // Adjusted classes for better mobile layout:
+            // flex-col on mobile, flex-row on sm screens and up
+            // items-start on mobile (aligns text/cost/buttons to top), items-center on sm and up
             listItem.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600';
             listItem.setAttribute('data-id', part.id); // Set a unique ID for the list item
 
             listItem.innerHTML = `
-                <div class="flex-grow mb-2 sm:mb-0">
-                    <span class="part-name text-gray-900 font-medium dark:text-gray-200">${part.name}</span>
-                    <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4">${formatCurrency(part.cost)}</span>
+                <div class="flex-grow mb-2 sm:mb-0 pr-2">
+                    <span class="part-name text-gray-900 font-medium dark:text-gray-200 block sm:inline-block truncate">${part.name}</span>
+                    <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4 mt-1 sm:mt-0">${formatCurrency(part.cost)}</span>
                 </div>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2 w-full sm:w-auto justify-end sm:justify-start">
                     <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105">
                         Editar
                     </button>
@@ -304,12 +307,14 @@
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.value = part.name;
+            // Adjusted classes for editing inputs on mobile
             nameInput.className = 'w-full p-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-2 sm:mb-0 sm:mr-2';
 
             const costInput = document.createElement('input');
             costInput.type = 'number';
             costInput.value = part.cost;
-            costInput.className = 'w-full p-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white';
+            // Adjusted classes for editing inputs on mobile
+            costInput.className = 'w-full p-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-2 sm:mb-0'; // Added mb-2 for vertical spacing on mobile
             costInput.min = "0";
             costInput.step = "any";
 
@@ -323,10 +328,16 @@
             cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105';
 
             // Replace spans with inputs and buttons
-            nameSpan.replaceWith(nameInput);
-            costSpan.replaceWith(costInput);
-            editBtn.replaceWith(saveBtn);
-            deleteBtn.replaceWith(cancelBtn);
+            const divContent = listItem.querySelector('.flex-grow'); // Get the div that contains name and cost
+            const divButtons = listItem.querySelector('.flex.space-x-2'); // Get the div that contains buttons
+
+            divContent.innerHTML = ''; // Clear original content
+            divContent.appendChild(nameInput);
+            divContent.appendChild(costInput);
+
+            divButtons.innerHTML = ''; // Clear original buttons
+            divButtons.appendChild(saveBtn);
+            divButtons.appendChild(cancelBtn);
 
             // Event listener for Save
             saveBtn.addEventListener('click', () => saveEdit(id, nameInput.value, costInput.value));
@@ -368,11 +379,11 @@
             const listItem = partsList.querySelector(`[data-id="${id}"]`);
             if (listItem) {
                 listItem.innerHTML = `
-                    <div class="flex-grow mb-2 sm:mb-0">
-                        <span class="part-name text-gray-900 font-medium dark:text-gray-200">${newName}</span>
-                        <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4">${formatCurrency(newCost)}</span>
+                    <div class="flex-grow mb-2 sm:mb-0 pr-2">
+                        <span class="part-name text-gray-900 font-medium dark:text-gray-200 block sm:inline-block truncate">${newName}</span>
+                        <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4 mt-1 sm:mt-0">${formatCurrency(newCost)}</span>
                     </div>
-                    <div class="flex space-x-2">
+                    <div class="flex space-x-2 w-full sm:w-auto justify-end sm:justify-start">
                         <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105">
                             Editar
                         </button>
@@ -401,11 +412,11 @@
 
             // Simply re-render the item with original data
             listItem.innerHTML = `
-                <div class="flex-grow mb-2 sm:mb-0">
-                    <span class="part-name text-gray-900 font-medium dark:text-gray-200">${originalName}</span>
-                    <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4">${formatCurrency(originalCost)}</span>
+                <div class="flex-grow mb-2 sm:mb-0 pr-2">
+                    <span class="part-name text-gray-900 font-medium dark:text-gray-200 block sm:inline-block truncate">${originalName}</span>
+                    <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4 mt-1 sm:mt-0">${formatCurrency(originalCost)}</span>
                 </div>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2 w-full sm:w-auto justify-end sm:justify-start">
                     <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105">
                         Editar
                     </button>
