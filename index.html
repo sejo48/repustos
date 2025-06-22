@@ -23,7 +23,7 @@
             background-color: #2d3748; /* Darker container */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
         }
-        body.dark h1, body.dark h2, body.dark label {
+        body.dark h1, body.dark h2, body.dark label, body.dark th {
             color: #e2e8f0; /* Light text in dark mode */
         }
         body.dark input {
@@ -68,12 +68,93 @@
         body.dark .text-green-700 { /* For cost in list */
              color: #68d391;
         }
+
+        /* Invoice table specific styles */
+        .invoice-table thead th {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem; /* leading-5 */
+            color: #4a5568; /* gray-700 */
+            background-color: #e2e8f0; /* gray-200 */
+        }
+        body.dark .invoice-table thead th {
+            background-color: #4a5568; /* dark gray */
+            color: #e2e8f0; /* light gray */
+        }
+        .invoice-table tbody tr {
+            border-bottom: 1px solid #e2e8f0; /* gray-200 */
+        }
+        body.dark .invoice-table tbody tr {
+            border-color: #4a5568;
+        }
+        .invoice-table tbody td {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem; /* leading-5 */
+            color: #2d3748; /* gray-800 */
+        }
+        body.dark .invoice-table tbody td {
+            color: #e2e8f0; /* light gray */
+        }
+        .invoice-table .actions-td {
+            white-space: nowrap; /* Prevent buttons from wrapping */
+            text-align: right; /* Align buttons to the right */
+        }
+
+        /* Mobile adjustments for invoice table cells */
+        @media (max-width: 639px) { /* Tailwinds 'sm' breakpoint is 640px */
+            .invoice-table thead {
+                display: none; /* Hide table header on small screens */
+            }
+            .invoice-table tbody tr {
+                display: block; /* Make table rows block level */
+                margin-bottom: 1rem; /* Add spacing between rows */
+                border: 1px solid #e2e8f0;
+                border-radius: 0.5rem;
+                padding: 0.75rem;
+                background-color: #ffffff;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            }
+            body.dark .invoice-table tbody tr {
+                border-color: #4a5568;
+                background-color: #4a5568;
+            }
+            .invoice-table tbody td {
+                display: flex; /* Make table cells flex */
+                justify-content: space-between; /* Space out label and value */
+                padding: 0.25rem 0; /* Adjust padding */
+                border-bottom: none; /* Remove individual cell borders */
+            }
+            .invoice-table tbody td:last-child {
+                border-bottom: none;
+            }
+            .invoice-table tbody td::before {
+                content: attr(data-label); /* Use data-label for pseudo-elements */
+                font-weight: 500;
+                margin-right: 0.5rem;
+                color: #718096; /* gray-600 */
+            }
+            body.dark .invoice-table tbody td::before {
+                color: #a0aec0; /* light gray */
+            }
+            .invoice-table .actions-td {
+                justify-content: flex-start; /* Align action buttons to start on mobile */
+                margin-top: 0.5rem; /* Add space above buttons */
+                gap: 0.5rem; /* Space between buttons */
+            }
+            .invoice-table .actions-td::before {
+                content: none; /* Hide label for actions on mobile */
+            }
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6 lg:p-8 flex flex-col items-center min-h-screen">
     <div class="container bg-white rounded-xl shadow-lg p-6 sm:p-8 lg:p-10 w-full max-w-2xl">
         <div class="flex justify-between items-center mb-6">
-            <!-- Adjusted heading size for mobile -->
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
                 Control de Gastos Reparación Mitsubishi X98
             </h1>
@@ -87,11 +168,9 @@
 
         <!-- Input Section -->
         <div class="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <!-- Adjusted subheading size for mobile -->
             <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-blue-800 mb-4">Agregar Repuesto</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <!-- Adjusted label size for mobile -->
                     <label for="partName" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Nombre del Repuesto:</label>
                     <input type="text" id="partName"
                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm sm:text-base"
@@ -99,8 +178,7 @@
                            required>
                 </div>
                 <div>
-                    <!-- Adjusted label size for mobile -->
-                    <label for="partCost" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Costo (₡):</label>
+                    <label for="partCost" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Costo Unitario (₡):</label>
                     <input type="number" id="partCost"
                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm sm:text-base"
                            placeholder="Ej: 25000"
@@ -109,28 +187,47 @@
                            required>
                 </div>
             </div>
+            <div class="mt-4">
+                <label for="partQuantity" class="block text-sm sm:text-base text-gray-700 font-medium mb-2">Cantidad:</label>
+                <input type="number" id="partQuantity"
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm sm:text-base"
+                       placeholder="Ej: 1"
+                       min="1"
+                       step="1"
+                       value="1"
+                       required>
+            </div>
             <button id="addPartBtn"
                     class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-base sm:text-lg">
                 Agregar Repuesto
             </button>
         </div>
 
-        <!-- Parts List Section -->
-        <div class="mb-8 p-4 bg-green-50 rounded-lg border border-green-200">
-            <!-- Adjusted subheading size for mobile -->
-            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-green-800 mb-4">Lista de Repuestos</h2>
-            <ul id="partsList" class="space-y-3">
-                <!-- Parts will be added here by JavaScript -->
-            </ul>
-            <!-- Adjusted text size for mobile -->
+        <!-- Parts List Section (Invoice Style) -->
+        <div class="mb-8 p-4 bg-green-50 rounded-lg border border-green-200 overflow-x-auto">
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-green-800 mb-4">Detalle de Repuestos (Factura)</h2>
+            <div class="min-w-full inline-block align-middle">
+                <table class="min-w-full invoice-table divide-y divide-gray-200 dark:divide-gray-600">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Repuesto</th>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Cant.</th>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">P. Unitario</th>
+                            <th scope="col" class="px-2 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Subtotal</th>
+                            <th scope="col" class="px-2 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partsList" class="bg-white divide-y divide-gray-200 dark:bg-gray-700 dark:divide-gray-600">
+                        <!-- Parts will be added here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
             <p id="noPartsMessage" class="text-sm sm:text-base text-gray-500 text-center mt-4">Aún no has agregado repuestos.</p>
         </div>
 
         <!-- Total Section -->
         <div class="p-5 bg-yellow-50 rounded-xl border border-yellow-300 flex justify-between items-center shadow-inner">
-            <!-- Adjusted heading size for mobile -->
-            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-800">Total de Gastos:</h2>
-            <!-- Adjusted total cost size for mobile -->
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-800">Total General:</h2>
             <span id="totalCost" class="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-900">₡0.00</span>
         </div>
     </div>
@@ -138,7 +235,6 @@
     <!-- Custom Modal for Alerts and Confirmations -->
     <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center max-w-sm mx-4">
-            <!-- Adjusted modal message text size for mobile -->
             <p id="modalMessage" class="text-base sm:text-lg text-gray-900 dark:text-gray-200 mb-4"></p>
             <div id="modalButtons" class="flex justify-center space-x-4">
                 <button id="modalConfirmBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out hidden text-sm sm:text-base">Confirmar</button>
@@ -150,9 +246,10 @@
     <script>
         // Get references to HTML elements
         const partNameInput = document.getElementById('partName');
-        const partCostInput = document.getElementById('partCost');
+        const partCostInput = document.getElementById('partCost'); // Now Unit Cost
+        const partQuantityInput = document.getElementById('partQuantity');
         const addPartBtn = document.getElementById('addPartBtn');
-        const partsList = document.getElementById('partsList');
+        const partsList = document.getElementById('partsList'); // This is now a tbody
         const totalCostSpan = document.getElementById('totalCost');
         const noPartsMessage = document.getElementById('noPartsMessage');
         const darkModeToggle = document.getElementById('darkModeToggle');
@@ -183,11 +280,19 @@
         }
 
         /**
+         * Calculates the total expenses by summing up all item subtotals.
+         */
+        function calculateTotalExpenses() {
+            totalExpenses = parts.reduce((sum, part) => sum + (part.cost * part.quantity), 0);
+            totalCostSpan.textContent = formatCurrency(totalExpenses);
+        }
+
+        /**
          * Saves the current parts and total expenses to local storage.
          */
         function saveToLocalStorage() {
             localStorage.setItem('mitsubishiX98Parts', JSON.stringify(parts));
-            localStorage.setItem('mitsubishiX98TotalExpenses', totalExpenses.toString());
+            calculateTotalExpenses(); // Recalculate total after saving
             updateNoPartsMessageVisibility();
         }
 
@@ -196,7 +301,6 @@
          */
         function loadFromLocalStorage() {
             const savedParts = localStorage.getItem('mitsubishiX98Parts');
-            const savedTotalExpenses = localStorage.getItem('mitsubishiX98TotalExpenses');
 
             if (savedParts) {
                 parts = JSON.parse(savedParts);
@@ -204,46 +308,40 @@
                     renderPartItem(part); // Render each loaded part
                 });
             }
-
-            if (savedTotalExpenses) {
-                totalExpenses = parseFloat(savedTotalExpenses);
-            }
-            totalCostSpan.textContent = formatCurrency(totalExpenses);
+            calculateTotalExpenses(); // Ensure total is calculated on load
             updateNoPartsMessageVisibility();
         }
 
         /**
-         * Renders a single part item in the list.
-         * @param {object} part - The part object { name, cost }.
+         * Renders a single part item as a table row (invoice style).
+         * @param {object} part - The part object { id, name, cost, quantity }.
          */
         function renderPartItem(part) {
-            const listItem = document.createElement('li');
-            // Adjusted classes for better mobile layout:
-            // flex-col on mobile, flex-row on sm screens and up
-            // items-start on mobile (aligns text/cost/buttons to top), items-center on sm and up
-            listItem.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600';
-            listItem.setAttribute('data-id', part.id); // Set a unique ID for the list item
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150';
+            tr.setAttribute('data-id', part.id);
 
-            listItem.innerHTML = `
-                <div class="flex-grow mb-2 sm:mb-0 pr-2">
-                    <!-- Adjusted text sizes for part name and cost -->
-                    <span class="part-name text-gray-900 font-medium dark:text-gray-200 block sm:inline-block truncate text-sm sm:text-base">${part.name}</span>
-                    <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4 mt-1 sm:mt-0 text-sm sm:text-base">${formatCurrency(part.cost)}</span>
-                </div>
-                <div class="flex space-x-2 w-full sm:w-auto justify-end sm:justify-start">
-                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
+            const subtotal = part.cost * part.quantity;
+
+            tr.innerHTML = `
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Repuesto:">${part.name}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Cant.:">${part.quantity}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="P. Unitario:">${formatCurrency(part.cost)}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-yellow-800 font-semibold dark:text-yellow-400" data-label="Subtotal:">${formatCurrency(subtotal)}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-right actions-td">
+                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105 mr-1">
                         Editar
                     </button>
                     <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
                         Eliminar
                     </button>
-                </div>
+                </td>
             `;
-            partsList.appendChild(listItem);
+            partsList.appendChild(tr);
 
             // Add event listeners to the new buttons
-            listItem.querySelector('.edit-btn').addEventListener('click', () => editPart(part.id));
-            listItem.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(part.id));
+            tr.querySelector('.edit-btn').addEventListener('click', () => editPart(part.id));
+            tr.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(part.id));
         }
 
         /**
@@ -263,6 +361,7 @@
         function addPart() {
             const name = partNameInput.value.trim();
             const cost = parseFloat(partCostInput.value);
+            const quantity = parseInt(partQuantityInput.value);
 
             // Validate inputs
             if (name === '') {
@@ -270,7 +369,11 @@
                 return;
             }
             if (isNaN(cost) || cost <= 0) {
-                showModal('Por favor, ingresa un costo válido mayor que cero.', 'alert');
+                showModal('Por favor, ingresa un costo unitario válido mayor que cero.', 'alert');
+                return;
+            }
+            if (isNaN(quantity) || quantity <= 0) {
+                showModal('Por favor, ingresa una cantidad válida mayor que cero.', 'alert');
                 return;
             }
 
@@ -278,19 +381,17 @@
             const newPart = {
                 id: Date.now(), // Simple unique ID using timestamp
                 name: name,
-                cost: cost
+                cost: cost,
+                quantity: quantity
             };
             parts.push(newPart); // Add to the parts array
 
             renderPartItem(newPart); // Render the new part in the list
 
-            // Update total expenses
-            totalExpenses += cost;
-            totalCostSpan.textContent = formatCurrency(totalExpenses);
-
-            // Clear input fields
+            // Clear input fields and reset quantity to 1 for convenience
             partNameInput.value = '';
             partCostInput.value = '';
+            partQuantityInput.value = '1';
 
             // Save data to local storage
             saveToLocalStorage();
@@ -301,144 +402,149 @@
          * @param {number} id - The ID of the part to edit.
          */
         function editPart(id) {
-            const listItem = partsList.querySelector(`[data-id="${id}"]`);
-            if (!listItem) return;
+            const tr = partsList.querySelector(`[data-id="${id}"]`);
+            if (!tr) return;
 
             const part = parts.find(p => p.id === id);
             if (!part) return;
 
-            // Get the current name and cost display elements
-            const nameSpan = listItem.querySelector('.part-name');
-            const costSpan = listItem.querySelector('.part-cost');
-            const editBtn = listItem.querySelector('.edit-btn');
-            const deleteBtn = listItem.querySelector('.delete-btn');
+            // Store original values to revert if cancelled
+            const originalName = part.name;
+            const originalCost = part.cost;
+            const originalQuantity = part.quantity;
 
-            // Create input fields
+            // Get all existing cells
+            const cells = tr.querySelectorAll('td');
+
+            // Create input fields for Name, Quantity, Unit Cost
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.value = part.name;
-            // Adjusted classes for editing inputs on mobile
-            nameInput.className = 'w-full p-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-2 sm:mb-0 sm:mr-2 text-sm sm:text-base';
+            nameInput.className = 'w-full p-1 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white text-sm';
+            nameInput.setAttribute('data-label', 'Repuesto:'); // For mobile display
+
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.value = part.quantity;
+            quantityInput.className = 'w-full p-1 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white text-sm';
+            quantityInput.min = "1";
+            quantityInput.step = "1";
+            quantityInput.setAttribute('data-label', 'Cant.:'); // For mobile display
 
             const costInput = document.createElement('input');
             costInput.type = 'number';
             costInput.value = part.cost;
-            // Adjusted classes for editing inputs on mobile
-            costInput.className = 'w-full p-2 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white mb-2 sm:mb-0 text-sm sm:text-base'; // Added mb-2 for vertical spacing on mobile
+            costInput.className = 'w-full p-1 border border-gray-300 rounded-md bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white text-sm';
             costInput.min = "0";
             costInput.step = "any";
+            costInput.setAttribute('data-label', 'P. Unitario:'); // For mobile display
 
-            // Create save and cancel buttons
+            // Create Save and Cancel buttons
             const saveBtn = document.createElement('button');
             saveBtn.textContent = 'Guardar';
-            saveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105 mr-2';
+            saveBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded-lg text-xs transition duration-300 ease-in-out transform hover:scale-105 mr-1';
 
             const cancelBtn = document.createElement('button');
             cancelBtn.textContent = 'Cancelar';
-            cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105';
+            cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-2 rounded-lg text-xs transition duration-300 ease-in-out transform hover:scale-105';
 
-            // Replace spans with inputs and buttons
-            const divContent = listItem.querySelector('.flex-grow'); // Get the div that contains name and cost
-            const divButtons = listItem.querySelector('.flex.space-x-2'); // Get the div that contains buttons
+            // Replace cell content with input fields
+            cells[0].innerHTML = ''; // Name
+            cells[0].appendChild(nameInput);
+            cells[1].innerHTML = ''; // Quantity
+            cells[1].appendChild(quantityInput);
+            cells[2].innerHTML = ''; // Unit Price
+            cells[2].appendChild(costInput);
+            cells[3].textContent = ''; // Subtotal (will be recalculated on save)
 
-            divContent.innerHTML = ''; // Clear original content
-            divContent.appendChild(nameInput);
-            divContent.appendChild(costInput);
+            const actionsCell = cells[4];
+            actionsCell.innerHTML = ''; // Clear existing buttons
+            actionsCell.appendChild(saveBtn);
+            actionsCell.appendChild(cancelBtn);
 
-            divButtons.innerHTML = ''; // Clear original buttons
-            divButtons.appendChild(saveBtn);
-            divButtons.appendChild(cancelBtn);
-
-            // Event listener for Save
-            saveBtn.addEventListener('click', () => saveEdit(id, nameInput.value, costInput.value));
-            // Event listener for Cancel
-            cancelBtn.addEventListener('click', () => cancelEdit(id, part.name, part.cost));
+            // Add event listeners to the new buttons
+            saveBtn.addEventListener('click', () => saveEdit(id, nameInput.value, costInput.value, quantityInput.value));
+            cancelBtn.addEventListener('click', () => cancelEdit(id, originalName, originalCost, originalQuantity));
         }
 
         /**
          * Saves the edited part data.
          * @param {number} id - The ID of the part being edited.
          * @param {string} newName - The new name for the part.
-         * @param {number} newCost - The new cost for the part.
+         * @param {number} newCost - The new unit cost for the part.
+         * @param {number} newQuantity - The new quantity for the part.
          */
-        function saveEdit(id, newName, newCost) {
+        function saveEdit(id, newName, newCost, newQuantity) {
             newName = newName.trim();
             newCost = parseFloat(newCost);
+            newQuantity = parseInt(newQuantity);
 
             if (newName === '') {
                 showModal('Por favor, ingresa el nombre del repuesto.', 'alert');
                 return;
             }
             if (isNaN(newCost) || newCost <= 0) {
-                showModal('Por favor, ingresa un costo válido mayor que cero.', 'alert');
+                showModal('Por favor, ingresa un costo unitario válido mayor que cero.', 'alert');
+                return;
+            }
+            if (isNaN(newQuantity) || newQuantity <= 0) {
+                showModal('Por favor, ingresa una cantidad válida mayor que cero.', 'alert');
                 return;
             }
 
             const partIndex = parts.findIndex(p => p.id === id);
             if (partIndex === -1) return;
 
-            const oldCost = parts[partIndex].cost;
             parts[partIndex].name = newName;
             parts[partIndex].cost = newCost;
+            parts[partIndex].quantity = newQuantity;
 
-            // Update total expenses
-            totalExpenses = totalExpenses - oldCost + newCost;
-            totalCostSpan.textContent = formatCurrency(totalExpenses);
-
-            // Re-render the specific item
-            const listItem = partsList.querySelector(`[data-id="${id}"]`);
-            if (listItem) {
-                listItem.innerHTML = `
-                    <div class="flex-grow mb-2 sm:mb-0 pr-2">
-                        <span class="part-name text-gray-900 font-medium dark:text-gray-200 block sm:inline-block truncate text-sm sm:text-base">${newName}</span>
-                        <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4 mt-1 sm:mt-0 text-sm sm:text-base">${formatCurrency(newCost)}</span>
-                    </div>
-                    <div class="flex space-x-2 w-full sm:w-auto justify-end sm:justify-start">
-                        <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
-                            Editar
-                        </button>
-                        <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
-                            Eliminar
-                        </button>
-                    </div>
-                `;
-                // Re-attach event listeners
-                listItem.querySelector('.edit-btn').addEventListener('click', () => editPart(id));
-                listItem.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(id));
+            // Remove old row and re-render the updated row
+            const oldTr = partsList.querySelector(`[data-id="${id}"]`);
+            if (oldTr) {
+                partsList.removeChild(oldTr);
             }
+            renderPartItem(parts[partIndex]);
 
-            saveToLocalStorage();
+            saveToLocalStorage(); // This will also recalculate total
         }
 
         /**
          * Cancels the editing process and reverts the item to its original state.
          * @param {number} id - The ID of the part being edited.
          * @param {string} originalName - The original name of the part.
-         * @param {number} originalCost - The original cost of the part.
+         * @param {number} originalCost - The original unit cost of the part.
+         * @param {number} originalQuantity - The original quantity of the part.
          */
-        function cancelEdit(id, originalName, originalCost) {
-            const listItem = partsList.querySelector(`[data-id="${id}"]`);
-            if (!listItem) return;
+        function cancelEdit(id, originalName, originalCost, originalQuantity) {
+            const tr = partsList.querySelector(`[data-id="${id}"]`);
+            if (!tr) return;
 
-            // Simply re-render the item with original data
-            listItem.innerHTML = `
-                <div class="flex-grow mb-2 sm:mb-0 pr-2">
-                    <span class="part-name text-gray-900 font-medium dark:text-gray-200 block sm:inline-block truncate text-sm sm:text-base">${originalName}</span>
-                    <span class="part-cost text-green-700 font-semibold dark:text-green-400 block sm:inline-block sm:ml-4 mt-1 sm:mt-0 text-sm sm:text-base">${formatCurrency(originalCost)}</span>
-                </div>
-                <div class="flex space-x-2 w-full sm:w-auto justify-end sm:justify-start">
-                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
+            // Find the part in the array (even though we have original values, it's good practice)
+            const part = parts.find(p => p.id === id);
+            if (!part) return;
+
+            // Revert content of the row
+            tr.innerHTML = `
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Repuesto:">${originalName}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-gray-800 dark:text-gray-200" data-label="Cant.:">${originalQuantity}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-green-700 font-semibold dark:text-green-400" data-label="P. Unitario:">${formatCurrency(originalCost)}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-yellow-800 font-semibold dark:text-yellow-400" data-label="Subtotal:">${formatCurrency(originalCost * originalQuantity)}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-right actions-td">
+                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105 mr-1">
                         Editar
                     </button>
                     <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-xs sm:text-sm transition duration-300 ease-in-out transform hover:scale-105">
                         Eliminar
                     </button>
-                </div>
+                </td>
             `;
+
             // Re-attach event listeners
-            listItem.querySelector('.edit-btn').addEventListener('click', () => editPart(id));
-            listItem.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(id));
+            tr.querySelector('.edit-btn').addEventListener('click', () => editPart(id));
+            tr.querySelector('.delete-btn').addEventListener('click', () => confirmDeletePart(id));
         }
+
 
         /**
          * Confirms with the user before deleting a part.
@@ -456,20 +562,16 @@
             const partIndex = parts.findIndex(p => p.id === id);
             if (partIndex === -1) return;
 
-            // Subtract cost from total
-            totalExpenses -= parts[partIndex].cost;
-            totalCostSpan.textContent = formatCurrency(totalExpenses);
-
             // Remove from array
             parts.splice(partIndex, 1);
 
             // Remove from DOM
-            const listItem = partsList.querySelector(`[data-id="${id}"]`);
-            if (listItem) {
-                listItem.remove();
+            const tr = partsList.querySelector(`[data-id="${id}"]`);
+            if (tr) {
+                tr.remove();
             }
 
-            // Save data to local storage
+            // Save data to local storage (this will also recalculate total)
             saveToLocalStorage();
         }
 
@@ -542,6 +644,13 @@
         });
 
         partCostInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                addPart();
+            }
+        });
+
+        partQuantityInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); // Prevent default form submission
                 addPart();
