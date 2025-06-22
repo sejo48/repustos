@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Gastos Mitsubishi X98</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+            transition: background-color 0.3s ease;
+        }
+        body.dark {
+            background-color: #1a202c; /* Dark background */
+        }
+        .container {
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        body.dark .container {
+            background-color: #2d3748; /* Darker container */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+        body.dark h1, body.dark h2, body.dark label {
+            color: #e2e8f0; /* Light text in dark mode */
+        }
+        body.dark input {
+            background-color: #4a5568;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.dark input::placeholder {
+            color: #a0aec0;
+        }
+        body.dark .bg-blue-50 {
+            background-color: #2c5282; /* Darker blue section */
+            border-color: #4299e1;
+        }
+        body.dark .text-blue-800 {
+            color: #90cdf4;
+        }
+        body.dark .bg-green-50 {
+            background-color: #2f855a; /* Darker green section */
+            border-color: #48bb78;
+        }
+        body.dark .text-green-800 {
+            color: #9ae6b4;
+        }
+        body.dark .bg-yellow-50 {
+            background-color: #b7791f; /* Darker yellow section */
+            border-color: #ecc94b;
+        }
+        body.dark .text-yellow-800, body.dark .text-yellow-900 {
+            color: #feebc8;
+        }
+        body.dark .bg-white { /* For list items */
+            background-color: #4a5568;
+            border-color: #4a5568;
+        }
+        body.dark .text-gray-900 { /* For part name in list */
+            color: #e2e8f0;
+        }
+        body.dark .text-gray-500 { /* For no parts message */
+            color: #a0aec0;
+        }
+        body.dark .text-green-700 { /* For cost in list */
+             color: #68d391;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8 flex flex-col items-center min-h-screen">
+    <div class="container bg-white rounded-xl shadow-lg p-6 sm:p-8 lg:p-10 w-full max-w-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">
+                Control de Gastos Reparación Mitsubishi X98
+            </h1>
+            <!-- Dark Mode Toggle Button -->
+            <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h1M4 12H3m15.325 3.325l-.707.707M5.388 5.388l-.707-.707M18.611 5.388l.707-.707M5.388 18.611l-.707.707M12 7a5 5 0 110 10 5 5 0 010-10z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Input Section -->
+        <div class="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h2 class="text-xl sm:text-2xl font-semibold text-blue-800 mb-4">Agregar Repuesto</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="partName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Repuesto:</label>
+                    <input type="text" id="partName"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                           placeholder="Ej: Empaque de culata"
+                           required>
+                </div>
+                <div>
+                    <label for="partCost" class="block text-gray-700 text-sm font-medium mb-2">Costo (₡):</label>
+                    <input type="number" id="partCost"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                           placeholder="Ej: 25000"
+                           min="0"
+                           step="any"
+                           required>
+                </div>
+            </div>
+            <button id="addPartBtn"
+                    class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                Agregar Repuesto
+            </button>
+        </div>
+
+        <!-- Parts List Section -->
+        <div class="mb-8 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h2 class="text-xl sm:text-2xl font-semibold text-green-800 mb-4">Lista de Repuestos</h2>
+            <ul id="partsList" class="space-y-3">
+                <!-- Parts will be added here by JavaScript -->
+            </ul>
+            <p id="noPartsMessage" class="text-gray-500 text-center mt-4">Aún no has agregado repuestos.</p>
+        </div>
+
+        <!-- Total Section -->
+        <div class="p-5 bg-yellow-50 rounded-xl border border-yellow-300 flex justify-between items-center shadow-inner">
+            <h2 class="text-2xl sm:text-3xl font-bold text-yellow-800">Total de Gastos:</h2>
+            <span id="totalCost" class="text-2xl sm:text-3xl font-bold text-yellow-900">₡0.00</span>
+        </div>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const partNameInput = document.getElementById('partName');
+        const partCostInput = document.getElementById('partCost');
+        const addPartBtn = document.getElementById('addPartBtn');
+        const partsList = document.getElementById('partsList');
+        const totalCostSpan = document.getElementById('totalCost');
+        const noPartsMessage = document.getElementById('noPartsMessage');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        let totalExpenses = 0; // Initialize total expenses
+        let parts = []; // Array to store parts for persistence
+
+        /**
+         * Formats a number as Costa Rican Colones.
+         * @param {number} amount - The amount to format.
+         * @returns {string} The formatted amount.
+         */
+        function formatCurrency(amount) {
+            // Use Intl.NumberFormat for proper currency formatting
+            return new Intl.NumberFormat('es-CR', {
+                style: 'currency',
+                currency: 'CRC', // Costa Rican Colón
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        /**
+         * Saves the current parts and total expenses to local storage.
+         */
+        function saveToLocalStorage() {
+            localStorage.setItem('mitsubishiX98Parts', JSON.stringify(parts));
+            localStorage.setItem('mitsubishiX98TotalExpenses', totalExpenses.toString());
+        }
+
+        /**
+         * Loads parts and total expenses from local storage.
+         */
+        function loadFromLocalStorage() {
+            const savedParts = localStorage.getItem('mitsubishiX98Parts');
+            const savedTotalExpenses = localStorage.getItem('mitsubishiX98TotalExpenses');
+
+            if (savedParts) {
+                parts = JSON.parse(savedParts);
+                parts.forEach(part => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600';
+                    listItem.innerHTML = `
+                        <span class="text-gray-900 font-medium dark:text-gray-200">${part.name}</span>
+                        <span class="text-green-700 font-semibold dark:text-green-400">${formatCurrency(part.cost)}</span>
+                    `;
+                    partsList.appendChild(listItem);
+                });
+                noPartsMessage.classList.add('hidden'); // Hide message if parts are loaded
+            }
+
+            if (savedTotalExpenses) {
+                totalExpenses = parseFloat(savedTotalExpenses);
+            }
+            totalCostSpan.textContent = formatCurrency(totalExpenses);
+        }
+
+        /**
+         * Adds a new part to the list, updates the total, and saves to local storage.
+         */
+        function addPart() {
+            const name = partNameInput.value.trim();
+            const cost = parseFloat(partCostInput.value);
+
+            // Validate inputs
+            if (name === '') {
+                // Using a custom modal instead of alert()
+                showModal('Por favor, ingresa el nombre del repuesto.');
+                return;
+            }
+            if (isNaN(cost) || cost <= 0) {
+                showModal('Por favor, ingresa un costo válido mayor que cero.');
+                return;
+            }
+
+            // Create a new part object
+            const newPart = { name: name, cost: cost };
+            parts.push(newPart); // Add to the parts array
+
+            // Create a new list item for the part
+            const listItem = document.createElement('li');
+            listItem.className = 'flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600';
+            listItem.innerHTML = `
+                <span class="text-gray-900 font-medium dark:text-gray-200">${name}</span>
+                <span class="text-green-700 font-semibold dark:text-green-400">${formatCurrency(cost)}</span>
+            `;
+
+            // Append the new item to the parts list
+            partsList.appendChild(listItem);
+
+            // Update total expenses
+            totalExpenses += cost;
+            totalCostSpan.textContent = formatCurrency(totalExpenses);
+
+            // Clear input fields
+            partNameInput.value = '';
+            partCostInput.value = '';
+
+            // Hide "No parts" message if items are added
+            noPartsMessage.classList.add('hidden');
+
+            // Save data to local storage
+            saveToLocalStorage();
+        }
+
+        /**
+         * Toggles dark mode on and off.
+         */
+        function toggleDarkMode() {
+            body.classList.toggle('dark');
+            // Save user preference to local storage
+            if (body.classList.contains('dark')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        }
+
+        /**
+         * Initializes dark mode based on user preference or system setting.
+         */
+        function initDarkMode() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'enabled') {
+                body.classList.add('dark');
+            } else if (savedDarkMode === null && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // If no preference saved, check system preference
+                body.classList.add('dark');
+            }
+        }
+
+        /**
+         * Shows a custom modal message.
+         * @param {string} message - The message to display.
+         */
+        function showModal(message) {
+            // Create modal elements
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+
+            const modalContent = document.createElement('div');
+            modalContent.className = 'bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center max-w-sm mx-4';
+
+            const messageText = document.createElement('p');
+            messageText.className = 'text-gray-900 dark:text-gray-200 text-lg mb-4';
+            messageText.textContent = message;
+
+            const closeButton = document.createElement('button');
+            closeButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out';
+            closeButton.textContent = 'Aceptar';
+            closeButton.onclick = () => document.body.removeChild(modalOverlay);
+
+            modalContent.appendChild(messageText);
+            modalContent.appendChild(closeButton);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+        }
+
+
+        // Add event listener to the "Add Part" button
+        addPartBtn.addEventListener('click', addPart);
+
+        // Add event listener to the dark mode toggle button
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+
+        // Allow adding part by pressing Enter in input fields
+        partNameInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                addPart();
+            }
+        });
+
+        partCostInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                addPart();
+            }
+        });
+
+        // Load data and initialize dark mode when the page loads
+        window.onload = function() {
+            loadFromLocalStorage();
+            initDarkMode();
+        };
+
+        // Initial check for no parts message display
+        if (partsList.children.length === 0) {
+            noPartsMessage.classList.remove('hidden');
+        } else {
+            noPartsMessage.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
